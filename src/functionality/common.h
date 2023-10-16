@@ -1,0 +1,1 @@
+const float voltagePerStep = 3.3 / 4096;

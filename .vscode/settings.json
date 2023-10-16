@@ -1,0 +1,7 @@
+{
+    "idf.flashType": "UART",
+    "files.associations": {
+        "cmath": "cpp",
+        "algorithm": "cpp"
+    }
+}

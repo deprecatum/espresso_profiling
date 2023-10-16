@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "espresso_profiling",
+			"path": "espresso_profiling"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cmath": "cpp",
+			"random": "cpp",
+			"limits": "cpp"
+		}
+	}
+}
