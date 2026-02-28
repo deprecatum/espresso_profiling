@@ -8,11 +8,6 @@ enum class TimingCurves {
   INSTANT,
 };
 
-struct Flag {
-    Trigger trigger;
-    TriggerThreshold Threshold;
-};
-
 enum class Trigger {
     TIME,
     FLOW,
@@ -24,6 +19,11 @@ enum class TriggerThreshold {
     ABOVE,
     BELOW,
     EXACT,
+};
+
+struct Flag {
+    Trigger trigger;
+    TriggerThreshold Threshold;
 };
 
 float curve (float percentage, TimingCurves curve) {
@@ -44,7 +44,7 @@ float curve (float percentage, TimingCurves curve) {
     }
 };
 
-const struct step {
+struct Step {
     // seconds
     int time;
     // ML/s
@@ -56,11 +56,11 @@ const struct step {
     TimingCurves flowCurve;
     TimingCurves flowTemp;
     TimingCurves flowPressure;
-    // go to next step based on flags
+    // go to next Step based on flags
     Flag flags[];
 };
 
-const step preInfusion = {
+const Step preInfusion = {
     10, 
     1.1, 
     1.1, 
@@ -71,7 +71,7 @@ const step preInfusion = {
     {{ Trigger::PRESSURE, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
 };
 
-const step rampUp = {
+const Step rampUp = {
     1, 
     1.1, 
     1.1, 
@@ -82,7 +82,7 @@ const step rampUp = {
     {{ Trigger::PRESSURE, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
 };
 
-const step rampDown = {
+const Step rampDown = {
     1, 
     1.1, 
     1.1, 
@@ -93,6 +93,18 @@ const step rampDown = {
     {{ Trigger::PRESSURE, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
 };
 
-const step exampleProfile[] = {
-    preInfusion, rampUp, rampDown
+class Mode {
+    public:
+        Step Single[] = {
+            preInfusion, rampUp, rampDown
+        };
+
+        Step doubleExtraction[] = {
+            preInfusion, rampUp, rampDown
+        };
+        Step flush[] = {
+            rampUp
+        };
 };
+
+static Mode mode;

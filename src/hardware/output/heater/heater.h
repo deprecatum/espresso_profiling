@@ -1,3 +1,0 @@
-#define HEATER 
-
-float setTemp();
