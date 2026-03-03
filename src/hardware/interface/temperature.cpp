@@ -4,6 +4,6 @@
 
 
 enum StatusCode requestedTemperature () {
-
+    
     return StatusCode::fail;
 }

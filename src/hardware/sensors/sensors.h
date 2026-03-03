@@ -1,16 +1,12 @@
-#include <hardware\input\flow\TAB32-S21PO10C-11R.h>
-#include <hardware\input\pressure\generic_pressure_transducer.h>
-#include "hardware\input\temp\ntc_100k.h "
-
-void startSensors () {
-
-}
+#include <hardware/sensors/flow/TAB32-S21PO10C-11R.h>
+#include <hardware/sensors/pressure/generic_pressure_transducer.h>
+#include "hardware/sensors/temperature/ntc_100k.h"
 
 float getFlow() {
     return getML();
 };
 float getPressure() {
-    return getPSI();
+    return getBar();
 };
 
 float getTemperature(){

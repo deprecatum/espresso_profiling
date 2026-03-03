@@ -9,7 +9,13 @@
 // per v 125 psi
 
 const int psiPerADC = 366.67/4096;
+const int barPerADC = 25.28/4096;
 
 float getPSI () {
     return ceil(620 - analogRead(PRESSURE_SENSOR)) * psiPerADC;
 }
+
+float getBar () {
+    return ceil(620 - analogRead(PRESSURE_SENSOR)) * barPerADC;
+}
+

@@ -13,6 +13,8 @@ https://hackaday.com/2024/09/15/an-espresso-machine-for-the-diy-crowd/
 
 https://www.home-barista.com/espresso-machines/diy-espresso-machine-dual-thermoblock-dual-piston-pump-single-group-t77501.html
 
+https://espressoaf.com/
+
 
 examples
 https://github.com/CaiJonas/DeLonghi-Dedica-EC885-EC685-modification

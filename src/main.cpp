@@ -5,10 +5,19 @@
 #include <functionality/profiling.h>
 #include <functionality/extraction.cpp>
 
-StatusCode extractOneCoffe() {
-  StatusCode statusCode = StatusCode::success;
-  
-  return statusCode;
+void debug (boolean enabled) {
+  if (!enabled) {
+    Serial.print("Flow: ");
+    //Serial.print(getFlow());
+    Serial.print("\nTemp: ");
+    //Serial.print(getTemperature());
+    Serial.print("\nPressure:");
+    //Serial.print(getPressure());
+    digitalWrite(16, HIGH);  // turn the LED on (HIGH is the voltage level)
+    delay(500);                      // wait for a second
+    digitalWrite(16, LOW);   // turn the LED off by making the voltage LOW
+    delay(500); 
+  }
 }
 
 void errorHandling(StatusCode statusCode) {
@@ -55,31 +64,48 @@ void setup() {
   pinMode(FLUSH, INPUT_PULLUP);
   pinMode(OUTPUT_STEAM, INPUT_PULLUP);
 
-  // convert to bit mask read, and use switch case for the options, using binary
+  /*
+  convert code to use registers instead like GPIOA and GPIOB to set all pints, 
+  and use switch case with bit operators to identify buttons 
+  */
 }
 
 void loop() {
   StatusCode statusCode = StatusCode::standby;
-  Mode mode;
+  int operationMode;
   boolean steamEnabled = false;
-  if (digitalRead(SINGLE_EXTRACTION) == LOW) {
-    
-  }
-  if (digitalRead(DOUBLE_EXTRACTION) == LOW) {
-    
-  }
-  if (digitalRead(FLUSH) == LOW) {
-    
-  }
+  int inputs=((digitalRead(SINGLE_EXTRACTION)<<OperationMode::singleExtraction) 
+  |  (digitalRead(DOUBLE_EXTRACTION)<<OperationMode::doubleExtraction) 
+  | (digitalRead(FLUSH)<<OperationMode::flush) 
+  | digitalRead(OUTPUT_STEAM<<OperationMode::outputSteam)):
 
-  steamEnabled = digitalRead(OUTPUT_STEAM) == LOW;
+  /*
+  switch (inputs) {
+  case OperationMode::singleExtraction: 
+       statusCode = outputMode(1);
+       break;
+     
+     case OperationMode::doubleExtraction: 
+       statusCode = outputMode(1);
+       break;
+     
+     case OperationMode::flush: 
+       statusCode = outputMode(1);
+       break;
+     case OperationMode::outputSteam: 
+       steamEnabled = true;
+       statusCode = outputSteam();
+       break;
+     
+     default: break;
+   }
+  */
 
   if (mode && !steamEnabled) {
     statusCode = outputMode();
   } else if (
     steamEnabled
   ) {
-    statusCode = outputSteam();
   }
 
   // intercept one extraction
@@ -88,19 +114,4 @@ void loop() {
   // steam
   debug(ENABLE_DEBUG);
   errorHandling(statusCode);
-}
-
-void debug (boolean enabled) {
-  if (!enabled) {
-    Serial.print("Flow: ");
-    //Serial.print(getFlow());
-    Serial.print("\nTemp: ");
-    //Serial.print(getTemperature());
-    Serial.print("\nPressure:");
-    //Serial.print(getPressure());
-    digitalWrite(16, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(500);                      // wait for a second
-    digitalWrite(16, LOW);   // turn the LED off by making the voltage LOW
-    delay(500); 
-  }
 }

@@ -14,7 +14,7 @@ StatusCode handleSteps (Mode mode) {
         requestedPressure(target, time, curve)
         */
     }
-    return code;
+    return StatusCode::fail;
 }
 
 void flush () {
@@ -22,16 +22,6 @@ void flush () {
 }
 
 StatusCode outputMode(Mode mode) {
-    switch (mode) {
-        case Mode::singleExtraction:
-        case Mode::doubleExtraction: 
-        case Mode::flush:
-        {
-            return handleSteps(mode);
-        }
-        default: {
-            return StatusCode::fail;
-            break;
-        }
-    }
+    return handleSteps(mode);
+    return StatusCode::fail;
 }

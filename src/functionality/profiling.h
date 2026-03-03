@@ -10,9 +10,7 @@ enum class TimingCurves {
 
 enum class Trigger {
     TIME,
-    FLOW,
-    TEMP,
-    PRESSURE
+    MEASUREMENT
 };
 
 enum class TriggerThreshold {
@@ -26,7 +24,8 @@ struct Flag {
     TriggerThreshold Threshold;
 };
 
-float curve (float percentage, TimingCurves curve) {
+// percentage is given from 0.00 to 1.0, to be plotted against time from 0 to X
+float curveFunction (float percentage, TimingCurves curve) {
     switch (curve) {
         case TimingCurves::EASE_IN:
             //x^2
@@ -51,7 +50,7 @@ struct Step {
     float requestedFlow;
     // Celsius
     float requestedTemp;
-    // PSI
+    // BAR
     float requestedPressure;
     TimingCurves flowCurve;
     TimingCurves flowTemp;
@@ -68,7 +67,7 @@ const Step preInfusion = {
     TimingCurves::LINEAR, 
     TimingCurves::INSTANT, 
     TimingCurves::LINEAR, 
-    {{ Trigger::PRESSURE, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+    {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
 };
 
 const Step rampUp = {
@@ -79,7 +78,7 @@ const Step rampUp = {
     TimingCurves::LINEAR, 
     TimingCurves::INSTANT, 
     TimingCurves::LINEAR, 
-    {{ Trigger::PRESSURE, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+    {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
 };
 
 const Step rampDown = {
@@ -90,21 +89,29 @@ const Step rampDown = {
     TimingCurves::LINEAR, 
     TimingCurves::INSTANT, 
     TimingCurves::LINEAR, 
-    {{ Trigger::PRESSURE, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+    {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
 };
 
-class Mode {
-    public:
-        Step Single[] = {
-            preInfusion, rampUp, rampDown
-        };
-
-        Step doubleExtraction[] = {
-            preInfusion, rampUp, rampDown
-        };
-        Step flush[] = {
-            rampUp
-        };
+enum OperationMode : int {
+    singleExtraction = 0L,
+    doubleExtraction = 1L,
+    flush = 2L,
+    outputSteam = 3
 };
 
-static Mode mode;
+StatusCode handleMeasurementThreshold (Trigger trigger, TriggerThreshold threshold, float measurement, float measurementTargetBottom, float measurementTargetTop, StatusCode(*unsetFunction)(void)) {
+    switch (threshold) {
+        case TriggerThreshold::ABOVE: {
+            if (measurement > measurementTargetTop) return unsetFunction();
+            break;
+        }
+        case TriggerThreshold::EXACT: {
+            if (measurement > measurementTargetBottom && measurement < measurementTargetTop) return unsetFunction();
+            break;
+        }
+        case TriggerThreshold::BELOW: {
+            if (measurement < measurementTargetBottom) return unsetFunction();
+            break;
+        }
+    };
+};
