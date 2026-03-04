@@ -1,8 +1,7 @@
 #include <Arduino.h>
 #include <pindef.h>
 #include <main.h>
-#include <functionality/steam.cpp>
-#include <functionality/profiling.h>
+#include <functionality/espressoProfile.h>
 #include <functionality/extraction.cpp>
 
 void debug (boolean enabled) {
@@ -68,6 +67,37 @@ void setup() {
   convert code to use registers instead like GPIOA and GPIOB to set all pints, 
   and use switch case with bit operators to identify buttons 
   */
+ /*
+  set temperature for thermoblock
+ */
+}
+
+StatusCode handleSteps (Step steps[]) {
+    StatusCode code = StatusCode::fail;
+    int numSteps = sizeof(steps);
+    // time
+    int ellapsedTime = 0;
+    int requestedTime = 0;
+    // flow
+    float requestedMilliliters = 0;
+    // profiler response
+    CurveResponse response;
+
+    for (int i=0; i == numSteps; i++) {
+
+      Step step = steps[i];
+      requestedTime = requestedTime + step.time;
+      //response = setCurve(step.requestedPressure, step.time, step.);
+      // reset flow counter
+
+      // set flow; temp; pressure for Y time
+      /*
+      requestedTemp(target, time, curve)
+      requestedFlow(target, time, curve)
+      requestedPressure(target, time, curve)
+      */
+    }
+    return code;
 }
 
 void loop() {
@@ -77,14 +107,75 @@ void loop() {
   int inputs=((digitalRead(SINGLE_EXTRACTION)<<OperationMode::singleExtraction) 
   |  (digitalRead(DOUBLE_EXTRACTION)<<OperationMode::doubleExtraction) 
   | (digitalRead(FLUSH)<<OperationMode::flush) 
-  | digitalRead(OUTPUT_STEAM<<OperationMode::outputSteam)):
+  | digitalRead(OUTPUT_STEAM<<OperationMode::outputSteam));
 
-  /*
+  const Step preInfusion = {
+      5, 
+      1, 
+      85, 
+      3.0, 
+      TimingCurves::LINEAR, 
+      TimingCurves::INSTANT, 
+      TimingCurves::EASE_IN, 
+      {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+  };
+
+  const Step extraction = {
+      1, 
+      30, 
+      90, 
+      9.0, 
+      TimingCurves::LINEAR, 
+      TimingCurves::INSTANT, 
+      TimingCurves::EASE_IN, 
+      {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+  };
+
+  const Step doubleExtraction = {
+      1, 
+      60, 
+      90, 
+      9.0, 
+      TimingCurves::LINEAR, 
+      TimingCurves::INSTANT, 
+      TimingCurves::EASE_IN, 
+      {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+  };
+
+  const Step rampDown = {
+      10, 
+      0, 
+      STANDBY_TEMPERATURE, 
+      0, 
+      TimingCurves::INSTANT, 
+      TimingCurves::INSTANT, 
+      TimingCurves::INSTANT, 
+      {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+  };
+
+  const Step outputSteam = {
+      10, 
+      0, 
+      OUTPUT_STEAM_PRESSURE, 
+      9.0, 
+      TimingCurves::INSTANT, 
+      TimingCurves::INSTANT, 
+      TimingCurves::INSTANT, 
+      {{ Trigger::MEASUREMENT, TriggerThreshold::EXACT }, { Trigger::TIME, TriggerThreshold::ABOVE }},
+  };
+
+  Step singleExtractionSteps[3] = {preInfusion, extraction, rampDown};
+  Step doubleExtractionSteps[3] = {preInfusion, extraction, rampDown};
+  Step flushSteps[1] = {preInfusion};
+  Step flushSteps[1] = {preInfusion};
+  StatusCode statusCode; 
+
   switch (inputs) {
-  case OperationMode::singleExtraction: 
-       statusCode = outputMode(1);
-       break;
-     
+    case OperationMode::singleExtraction: {
+      statusCode = handleSteps(singleExtractionSteps);
+      break;
+    }
+    /*
      case OperationMode::doubleExtraction: 
        statusCode = outputMode(1);
        break;
@@ -96,17 +187,10 @@ void loop() {
        steamEnabled = true;
        statusCode = outputSteam();
        break;
+      */
      
-     default: break;
+     default: {break;}
    }
-  */
-
-  if (mode && !steamEnabled) {
-    statusCode = outputMode();
-  } else if (
-    steamEnabled
-  ) {
-  }
 
   // intercept one extraction
   // two extractions
